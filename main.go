@@ -1,33 +1,60 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/MemoVDG/price_checker/handlers"
 	"github.com/gin-gonic/gin"
-	"log"
-	"os"
+	"regexp"
+	"strings"
 )
 
 func main() {
 	router := gin.Default()
 	v1 := router.Group("/v1")
 	{
-		v1.GET("/test", ch)
-		v1.GET("/", hello)
 		v1.POST("/", handlers.HandleTelegramWebhook)
+		v1.POST("/test", regex)
 	}
 
-	router.Run(":80") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	router.Run(":8000")
 }
 
-func hello(c *gin.Context) {
+type Test struct {
+	Store string
+}
+
+func hitToAmazonURL(url string) {
+	// Amazon done in amazonScrappingFile.go
+}
+
+func storeConsulting(store string) {
+	fmt.Println(store)
+	switch store {
+	case "amazon":
+		hitToAmazonURL("ssss")
+	case "mercardolibre":
+		fmt.Println("two")
+	default:
+		fmt.Println("error")
+	}
+}
+
+func regex(c *gin.Context) {
+	var r = c.Request
+	var test Test
+
+	err := json.NewDecoder(r.Body).Decode(&test)
+	if err != nil {
+		return
+	}
+	pat := regexp.MustCompile("\\/(.*?)\\:")
+	match := pat.FindStringSubmatch(test.Store)
+	if len(match) > 1 {
+		storeConsulting(strings.ToLower(match[1]))
+	}
+
 	c.JSON(200, gin.H{
 		"message": "Salem",
-	})
-}
-
-func ch(c *gin.Context) {
-	log.Printf(os.Getenv("TELEGRAM_BOT_TOKEN"))
-	c.JSON(200, gin.H{
-		"message": "Chaleeee",
 	})
 }
