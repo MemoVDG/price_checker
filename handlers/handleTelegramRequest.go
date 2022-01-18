@@ -14,8 +14,6 @@ func HandleTelegramWebhook(c *gin.Context) {
 		return
 	}
 
-	log.Println(update.Message.Text)
-
 	var telegramaResposeBody, errTelegram = utils.SendTextToTelegram(update.Message.Chat.Id, "Tests")
 	if errTelegram != nil {
 		log.Printf("Got an error sending message to API %s %s", errTelegram.Error(), telegramaResposeBody)
